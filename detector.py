@@ -10,14 +10,14 @@ import requests
 from datetime import datetime
 
 # === 設定 ===
-DURATION = 2              # 録音秒数（秒）
-FS = 44100                # サンプリングレート
-THRESHOLD = 0.85          # 類似度のしきい値
+DURATION = 2             # 録音秒数（秒）
+FS = 44100                   # サンプリングレート
+THRESHOLD = 0.8        # 類似度のしきい値
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 REF_PATH = os.path.join(BASE_DIR, "reference", "interphone.wav")
 
 load_dotenv()
-LINE_CHANNEL_TOKEN = os.getenv("LINE_CHANNEL_TOKEN")
+LINE_ACCESS_TOKEN = os.getenv("LINE_ACCESS_TOKEN")
 LINE_USER_ID = os.getenv("LINE_USER_ID")
 
 
@@ -25,7 +25,7 @@ def send_line_notify(message: str):
     url = "https://api.line.me/v2/bot/message/push"
     headers = {
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {LINE_CHANNEL_TOKEN}"
+        "Authorization": f"Bearer {LINE_ACCESS_TOKEN}"
     }
     payload = {
         "to": LINE_USER_ID,
