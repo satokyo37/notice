@@ -7,6 +7,7 @@ import scipy.io.wavfile as wav
 import python_speech_features as psf
 from dotenv import load_dotenv
 import requests
+from datetime import datetime
 
 # === 設定 ===
 DURATION = 2              # 録音秒数（秒）
@@ -77,13 +78,15 @@ def main():
 
             # 判定
             if similarity > THRESHOLD:
-                send_line_notify("Interphone sound detected!")
+                now = datetime.now().strftime("%Y/%m/%d %H:%M")
+                message = f"🔔 インターホンを検知しました（{now}）"
+                send_line_notify(message)
                 os.system('sudo hub-ctrl -h 1 -P 2 -p 1')
                 print("Interphone sound detected!\n")
                 time.sleep(10)
                 print('Keep watching...')
             else:
-                print("Not similar nough\n")
+                print("Not similar enough\n")
     except KeyboardInterrupt:
         print("\nDetection stopped")
         os.system('sudo hub-ctrl -h 1 -P 2 -p 1')
