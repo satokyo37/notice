@@ -12,7 +12,7 @@
 - Raspberry Pi 3B+
 - Bluetoothヘッドセット（音声入力）
 
-### 📣 想定される通知手段
+### 想定される通知手段
 - LINE通知（Messaging API）
 - パトランプ点灯（GPIO制御）
 
