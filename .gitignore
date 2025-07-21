@@ -1,0 +1,3 @@
+reference/*.wav
+venv/
+__pycache__/
