@@ -31,7 +31,7 @@ Raspberry Pi 3B+ では個別のUSBポート制御ができず、全ポートが
 ## パッケージのインストール
 
 `sudo apt install python3 python3-pip python3-venv hub-ctrl`  
-`pip install sounddevice scipy numpy python_speech_features scikit-learn`
+`pip install sounddevice scipy numpy python_speech_features scikit-learn python-dotenv`
 
 ## 音声の準備
 
