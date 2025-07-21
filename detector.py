@@ -1,21 +1,23 @@
-import sounddevice as sd
 import numpy as np
-import librosa
+import sounddevice as sd
 from sklearn.metrics.pairwise import cosine_similarity
 import time
 import os
+import scipy.io.wavfile as wav
+import python_speech_features as psf
 
 # === 設定 ===
 DURATION = 2              # 録音秒数（秒）
 FS = 44100                # サンプリングレート
 THRESHOLD = 0.85          # 類似度のしきい値
-REF_PATH = "reference/interphone.wav"  # 参照用音声ファイルのパス
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+REF_PATH = os.path.join(BASE_DIR, "reference", "interphone.wav")
 
 
 # === MFCC特徴量を抽出する関数 ===
 def extract_mfcc(y, sr):
-    mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
-    return np.mean(mfcc, axis=1)
+    mfcc = psf.mfcc(y, samplerate=sr, numcep=13)
+    return np.mean(mfcc, axis=0)
 
 
 # === 類似度を計算する関数 ===
@@ -29,7 +31,7 @@ def main():
     print("Press Ctrl+C to stop\n")
 
     # 参照音声から特徴ベクトルを作成
-    ref_y, ref_sr = librosa.load(REF_PATH, sr=FS)
+    ref_sr, ref_y = wav.read(REF_PATH)
     ref_vec = extract_mfcc(ref_y, ref_sr)
 
     try:
@@ -51,10 +53,10 @@ def main():
             if similarity > THRESHOLD:
                 os.system('sudo hub-ctrl -h 1 -P 2 -p 1')
                 print("Interphone sound detected!\n")
-                time.sleep(5)
+                time.sleep(10)
                 print('Keep watching...')
             else:
-                print("Not similar enough\n")
+                print("Not similar nough\n")
     except KeyboardInterrupt:
         print("\nDetection stopped")
         os.system('sudo hub-ctrl -h 1 -P 2 -p 1')
