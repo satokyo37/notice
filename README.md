@@ -23,4 +23,5 @@
 `sudo apt install python3 python3-pip python3-venv python3-numpy libsndfile1 ffmpeg`
 
 ## 音声の準備
-reference/interphone.wavに実際に検出したいインターホン音 を録音して保存
+referenceフォルダを作成
+reference直下のinterphone.wavに、実際に検出したいインターホン音を録音して保存
