@@ -31,5 +31,5 @@
 
 ## 音声の準備
 
-referenceフォルダを作成
+referenceフォルダを作成  
 reference直下のinterphone.wavに、実際に検出したいインターホン音を録音して保存
