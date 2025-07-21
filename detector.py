@@ -42,7 +42,7 @@ def send_line_notify(message: str):
 
 # === MFCC特徴量を抽出する関数 ===
 def extract_mfcc(y, sr):
-    mfcc = psf.mfcc(y, samplerate=sr, numcep=13)
+    mfcc = psf.mfcc(y, samplerate=sr, numcep=13, nfft=2048)
     return np.mean(mfcc, axis=0)
 
 
