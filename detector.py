@@ -5,6 +5,8 @@ import time
 import os
 import scipy.io.wavfile as wav
 import python_speech_features as psf
+from dotenv import load_dotenv
+import requests
 
 # === 設定 ===
 DURATION = 2              # 録音秒数（秒）
@@ -12,6 +14,30 @@ FS = 44100                # サンプリングレート
 THRESHOLD = 0.85          # 類似度のしきい値
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 REF_PATH = os.path.join(BASE_DIR, "reference", "interphone.wav")
+
+load_dotenv()
+LINE_CHANNEL_TOKEN = os.getenv("LINE_CHANNEL_TOKEN")
+LINE_USER_ID = os.getenv("LINE_USER_ID")
+
+
+def send_line_notify(message: str):
+    url = "https://api.line.me/v2/bot/message/push"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {LINE_CHANNEL_TOKEN}"
+    }
+    payload = {
+        "to": LINE_USER_ID,
+        "messages": [
+            {
+                "type": "text",
+                "text": message
+            }
+        ]
+    }
+
+    res = requests.post(url, headers=headers, json=payload)
+    print(f"LINE response: {res.status_code} - {res.text}")
 
 
 # === MFCC特徴量を抽出する関数 ===
@@ -51,6 +77,7 @@ def main():
 
             # 判定
             if similarity > THRESHOLD:
+                send_line_notify("Interphone sound detected!")
                 os.system('sudo hub-ctrl -h 1 -P 2 -p 1')
                 print("Interphone sound detected!\n")
                 time.sleep(10)
