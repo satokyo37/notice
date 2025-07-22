@@ -10,6 +10,8 @@ import requests
 from datetime import datetime
 
 # === 設定 ===
+PID_FILE = "detector.pid"
+
 DURATION = 2             # 録音秒数（秒）
 FS = 44100                   # サンプリングレート
 THRESHOLD = 0.8        # 類似度のしきい値
@@ -19,6 +21,20 @@ REF_PATH = os.path.join(BASE_DIR, "reference", "interphone.wav")
 load_dotenv()
 LINE_ACCESS_TOKEN = os.getenv("LINE_ACCESS_TOKEN")
 LINE_USER_ID = os.getenv("LINE_USER_ID")
+
+
+def write_pid():
+    with open(PID_FILE, "w") as f:
+        f.write(str(os.getpid()))
+
+
+def remove_pid():
+    if os.path.exists(PID_FILE):
+        os.remove(PID_FILE)
+
+
+def should_continue():
+    return os.path.exists("start_flag")
 
 
 def send_line_notify(message: str):
@@ -54,6 +70,7 @@ def compute_similarity(ref_vec, new_vec):
 
 # === メイン処理 ===
 def main():
+    write_pid()
     print("Starting Interphone Sound Detector")
     print("Press Ctrl+C to stop\n")
 
@@ -62,7 +79,7 @@ def main():
     ref_vec = extract_mfcc(ref_y, ref_sr)
 
     try:
-        while True:
+        while should_continue():
             os.system('sudo hub-ctrl -h 1 -P 2 -p 0')   # ハブの電源をオフにして待機
             print("Recording...")
             recording = sd.rec(int(DURATION * FS), samplerate=FS, channels=1)
@@ -87,9 +104,10 @@ def main():
                 print('Keep watching...')
             else:
                 print("Not similar enough\n")
-    except KeyboardInterrupt:
-        print("\nDetection stopped")
+    finally:
         os.system('sudo hub-ctrl -h 1 -P 2 -p 1')
+        remove_pid()
+        print("\nDetection stopped")
 
 
 if __name__ == "__main__":
