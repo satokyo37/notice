@@ -1,16 +1,12 @@
-from flask import Flask, request
-import os
-import requests
-import json
-import subprocess
 from dotenv import load_dotenv
+from flask import Flask, request
+from line_utils import reply_to_line
+import os
 import psutil
+import subprocess
 
 app = Flask(__name__)
 load_dotenv()
-
-# LINE Messaging APIのアクセストークン
-LINE_ACCESS_TOKEN = os.environ.get("LINE_ACCESS_TOKEN")
 
 
 def is_detector_running():
@@ -25,25 +21,6 @@ def is_detector_running():
         return False
 
 
-def reply_to_line(reply_token, text):
-    url = "https://api.line.me/v2/bot/message/reply"
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {LINE_ACCESS_TOKEN}"
-    }
-    payload = {
-        "replyToken": reply_token,
-        "messages": [
-            {
-                "type": "text",
-                "text": text
-            }
-        ]
-    }
-    response = requests.post(url, headers=headers, data=json.dumps(payload))
-    print(f"Reply status: {response.status_code} - {response.text}")
-
-
 def handle_start(reply_token):
     if not os.path.exists("start_flag"):
         with open("start_flag", "w") as f:
@@ -52,7 +29,7 @@ def handle_start(reply_token):
             reply_to_line(reply_token, "✅ 検知はすでに実行中です。")
         else:
             subprocess.Popen(["python3", "detector.py"])
-            reply_to_line(reply_token, "🔔 検知を開始しました。インターホンを監視中です。")
+            reply_to_line(reply_token, "📥 検知の開始リクエストを受け付けました。")
     else:
         reply_to_line(reply_token, "✅ すでに検知中です。")
 

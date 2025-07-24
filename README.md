@@ -49,7 +49,7 @@ LINE の公式アカウントに対して以下のメッセージを送信する
 
 ```bash
 sudo apt install python3 python3-pip python3-venv hub-ctrl  
-pip install sounddevice scipy numpy python_speech_features scikit-learn python-dotenv flask psutil
+pip install sounddevice scipy numpy python_speech_features scikit-learn python-dotenv flask psutil requests
 ```
 
 ### 環境変数
