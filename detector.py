@@ -1,13 +1,13 @@
-import numpy as np
-import sounddevice as sd
-from sklearn.metrics.pairwise import cosine_similarity
-import time
-import os
-import scipy.io.wavfile as wav
-import python_speech_features as psf
-from dotenv import load_dotenv
-import requests
 from datetime import datetime
+from dotenv import load_dotenv
+from line_utils import push_to_line
+import numpy as np
+import os
+import python_speech_features as psf
+import scipy.io.wavfile as wav
+from sklearn.metrics.pairwise import cosine_similarity
+import sounddevice as sd
+import time
 
 # === 設定 ===
 PID_FILE = "detector.pid"
@@ -19,8 +19,6 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 REF_PATH = os.path.join(BASE_DIR, "reference", "interphone.wav")
 
 load_dotenv()
-LINE_ACCESS_TOKEN = os.getenv("LINE_ACCESS_TOKEN")
-LINE_USER_ID = os.getenv("LINE_USER_ID")
 
 
 def write_pid():
@@ -35,26 +33,6 @@ def remove_pid():
 
 def should_continue():
     return os.path.exists("start_flag")
-
-
-def send_line_notify(message: str):
-    url = "https://api.line.me/v2/bot/message/push"
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {LINE_ACCESS_TOKEN}"
-    }
-    payload = {
-        "to": LINE_USER_ID,
-        "messages": [
-            {
-                "type": "text",
-                "text": message
-            }
-        ]
-    }
-
-    res = requests.post(url, headers=headers, json=payload)
-    print(f"LINE response: {res.status_code} - {res.text}")
 
 
 # === MFCC特徴量を抽出する関数 ===
@@ -79,6 +57,7 @@ def main():
     ref_vec = extract_mfcc(ref_y, ref_sr)
 
     try:
+        push_to_line("🔔 検知を開始しました。インターホンを監視中です。")
         while should_continue():
             os.system('sudo hub-ctrl -h 1 -P 2 -p 0')   # ハブの電源をオフにして待機
             print("Recording...")
@@ -97,7 +76,7 @@ def main():
             if similarity > THRESHOLD:
                 now = datetime.now().strftime("%Y/%m/%d %H:%M")
                 message = f"🔔 インターホンを検知しました（{now}）"
-                send_line_notify(message)
+                push_to_line(message)
                 os.system('sudo hub-ctrl -h 1 -P 2 -p 1')
                 print("Interphone sound detected!\n")
                 time.sleep(10)
