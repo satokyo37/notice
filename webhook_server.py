@@ -26,27 +26,27 @@ def handle_start(reply_token):
         with open("start_flag", "w") as f:
             f.write("1")
         if is_detector_running():
-            reply_to_line(reply_token, "✅ 検知はすでに実行中です。")
+            reply_to_line(reply_token, "[ERROR] 「停止」してからやり直してください。")
         else:
             subprocess.Popen(["python3", "detector.py"])
-            reply_to_line(reply_token, "📥 検知の開始リクエストを受け付けました。")
+            reply_to_line(reply_token, "[INFO] 検知の開始リクエストを受け付けました。")
     else:
-        reply_to_line(reply_token, "✅ すでに検知中です。")
+        reply_to_line(reply_token, "[INFO] すでに実行中です。")
 
 
 def handle_stop(reply_token):
     if os.path.exists("start_flag"):
         os.remove("start_flag")
-        reply_to_line(reply_token, "⏹️ 検知を停止しました。")
+        reply_to_line(reply_token, "[STOP] 検知を停止しました。")
     else:
-        reply_to_line(reply_token, "🚫 現在、検知は行われていません。")
+        reply_to_line(reply_token, "[INFO] 現在、検知は行われていません。")
 
 
 def handle_status(reply_token):
     if os.path.exists("start_flag") and is_detector_running():
-        reply_to_line(reply_token, "🟢 現在、検知は実行中です。")
+        reply_to_line(reply_token, "[STATUS] 現在、検知は実行中です。")
     else:
-        reply_to_line(reply_token, "⚪ 現在、検知は停止しています。")
+        reply_to_line(reply_token, "[STATUS] 現在、検知は停止しています。")
 
 
 @app.route("/callback", methods=["POST"])
@@ -65,16 +65,16 @@ def callback():
         elif message == "状態":
             handle_status(reply_token)
         else:
-            reply_to_line(reply_token, "「開始」「停止」「状態」のいずれかを送信してください。")
+            reply_to_line(reply_token, "[INFO] 「開始」「停止」「状態」のいずれかを送信してください。")
     except Exception as e:
         print(f"Error: {e}")
         if 'reply_token' in locals():
             try:
-                reply_to_line(reply_token, "⚠️ 処理中にエラーが発生しました。")
+                reply_to_line(reply_token, "[ERROR] 処理中にエラーが発生しました。")
             except Exception as e2:
                 print(f"Reply error: {e2}")
         else:
-            print("⚠️ Failed to retrieve reply_token.")
+            print("[ERROR] Failed to retrieve reply_token.")
 
     return "OK", 200
 

@@ -57,7 +57,7 @@ def main():
     ref_vec = extract_mfcc(ref_y, ref_sr)
 
     try:
-        push_to_line("🔔 検知を開始しました。インターホンを監視中です。")
+        push_to_line("[START] 検知を開始しました。インターホンを監視中です。")
         while should_continue():
             os.system('sudo hub-ctrl -h 1 -P 2 -p 0')   # ハブの電源をオフにして待機
             print("Recording...")
@@ -75,7 +75,7 @@ def main():
             # 判定
             if similarity > THRESHOLD:
                 now = datetime.now().strftime("%Y/%m/%d %H:%M")
-                message = f"🔔 インターホンを検知しました（{now}）"
+                message = f"[DETECTED] インターホンを検知しました（{now}）"
                 push_to_line(message)
                 os.system('sudo hub-ctrl -h 1 -P 2 -p 1')
                 print("Interphone sound detected!\n")
